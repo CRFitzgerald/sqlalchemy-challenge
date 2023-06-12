@@ -1,4 +1,4 @@
-import numpy as np
+#import numpy as np
 
 import sqlalchemy
 from sqlalchemy.ext.automap import automap_base
@@ -50,40 +50,49 @@ def precipitation():
     # Create our session (link) from Python to the DB
     session = Session(engine)
 
-    """Return a list of all passenger names"""
-    # Query all precipitation
+    """Return a dictionary of date keys with precipitation values for only the last 12 months"""
+    # Query precipitation
     previous_year = dt.date(2017,8,23)-dt.timedelta(days=365)
     precipitation_date = session.query(Measurement.date, Measurement.prcp).filter(Measurement.date > previous_year).all()
+    
     results = {date:prcp for date,pcrp in precipitation_date}
-
 
     session.close()
 
-
+    # Return the JSON representation of dictionary
     return jsonify(results)
 
 
-@app.route("/api/v1.0/passengers")
-def passengers():
+@app.route("/api/v1.0/stations")
+def stations():
     # Create our session (link) from Python to the DB
     session = Session(engine)
 
-    """Return a list of passenger data including the name, age, and sex of each passenger"""
-    # Query all passengers
-    results = session.query(Passenger.name, Passenger.age, Passenger.sex).all()
+    """Return a list of stations"""
+    # Query all stations
+    stations = session.query(Station.station)
+
+    session.close()
+    
+    # Return list as JSON 
+    return jsonify(stations)
+
+@app.route("/api/v1.0/tobs")
+def tobs():
+    # Create our session (link) from Python to the DB
+    session = Session(engine)
+
+    """Return a list of dates and temperature observations of last-year's most-active station"""
+    # Query dates and temp for most-active station USC00519281
+    previous_year = dt.date(2017,8,23)-dt.timedelta(days=365)
+    most_active_temp = session.query(Measurement.tobs).filter(Measurement.date > previous_year).filter(Measurement.station=='USC00519281').all()
+    
+    results = {date:tobs for date,tobs in most_active_temp}
 
     session.close()
 
-    # Create a dictionary from the row data and append to a list of all_passengers
-    all_passengers = []
-    for name, age, sex in results:
-        passenger_dict = {}
-        passenger_dict["name"] = name
-        passenger_dict["age"] = age
-        passenger_dict["sex"] = sex
-        all_passengers.append(passenger_dict)
-
-    return jsonify(all_passengers)
+    # Return the JSON representation of dictionary
+    return jsonify(results)
 
 
 if __name__ == '__main__':
