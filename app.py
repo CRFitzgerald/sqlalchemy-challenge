@@ -32,7 +32,6 @@ app = Flask(__name__)
 # Flask Routes
 #################################################
 
-# Landing Page
 @app.route("/")
 def welcome():
     """List all available api routes."""
@@ -56,7 +55,7 @@ def precipitation():
     previous_year = dt.date(2017,8,23)-dt.timedelta(days=365)
     precipitation_date = session.query(Measurement.date, Measurement.prcp).filter(Measurement.date > previous_year).all()
     
-    # Save data in dictionary and close session
+    # Save query to dictionary and close session
     results = {date :prcp for date,prcp in precipitation_date}
 
     session.close()
@@ -74,7 +73,7 @@ def stations():
     # Query all stations
     stations = session.query(Station.station).all()
 
-    # Save stations in list and close session
+    # Save query as list and close session
     results = list(np.ravel(stations))
     session.close()
     
@@ -83,17 +82,17 @@ def stations():
 
 # Tobs Route - Static
 @app.route("/api/v1.0/tobs")
-def tobs():
+def precipitation():
     # Create our session (link) from Python to the DB
     session = Session(engine)
 
-    """Return a dictionary of date keys with tobs values for only the last 12 months only station USC00519281"""
-    # Query tobs
+    """Return a dictionary of date keys with tobs values for only the last 12 months at station USC00519281"""
+    # Query tobs at USCUSC00519281
     previous_year = dt.date(2017,8,23)-dt.timedelta(days=365)
     tobs_date = session.query(Measurement.date, Measurement.tobs).filter(Measurement.date > previous_year).filter(Measurement.station == 'USC00519281').all()
     
-    #Save data in dictionary with date keys and tobs values
-    results = {date :tobs for date,tobs in tobs_date}
+    # Save query to dictionary and close session
+    results = {date : tobs for date,tobs in tobs_date}
 
     session.close()
 
@@ -106,11 +105,9 @@ def temp(start=None):
     # Create our session (link) from Python to the DB
     session = Session(engine)
 
-    # Query temp starting at param set in URL until end of data set
     station_temp = session.query(func.min(Measurement.tobs), func.avg(Measurement.tobs), func.max(Measurement.tobs))\
         .filter(Measurement.date>=start).all()
     
-     # Save results in list and close session
     results = list(np.ravel(station_temp))
 
     session.close()
@@ -124,20 +121,15 @@ def temp_end(start=None,end=None):
     # Create our session (link) from Python to the DB
     session = Session(engine)
 
-    # Query temp starting at param and ending at param set in URL
     station_temp = session.query(func.min(Measurement.tobs), func.avg(Measurement.tobs), func.max(Measurement.tobs))\
         .filter(Measurement.date>=start).filter(Measurement.date<=end).all()
     
-    # Save results in list and close session
     results = list(np.ravel(station_temp))
 
     session.close()
 
     # Return the JSON representation of dictionary
     return jsonify(results)
-
-
-
 
 
 if __name__ == '__main__':
