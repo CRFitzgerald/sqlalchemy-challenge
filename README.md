@@ -1,5 +1,5 @@
 # sqlalchemy-challenge
-In this challenge, I used Python, Pandas, and SQLAlchemy ORM queries to perform climate analysis and data exploration on a Hawaiian weather database. I then created a Flask application to connect to the same database and create a landing page diplaying various routes - both static and dynamic - to various datasets of interest.
+In this challenge, I used Python, Pandas, and SQLAlchemy ORM queries to perform climate analysis and data exploration on a Hawaiian weather database. I then created a Flask application to connect to the same database and create a landing page diplaying various routes - both static and dynamic - to various datasets of interest. The Jupyter Notebook where I performed data analysis, app.py file containing my Flask code, and Resources folder with original data can call be found in the SurfsUp folder.
 
 ### Tools Used
 * Python
